@@ -1,103 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Positive Habit Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wellness Habit Tracker</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f9fafc;
-      color: #333;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
-    header {
-      background: #6c63ff;
+
+    button {
+      border-radius: 5px;
+      background-color: white;
+      border: none;
+
+    }
+
+    footer {
+      background-color: black;
       color: white;
-      padding: 1rem;
       text-align: center;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      height: auto;
     }
-    .container {
-      width: 90%;
-      margin: 1rem auto;
+
+    nav {
+      background-color: black;
+      color: white;
+      height: 20%;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
     }
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 5px;
-      margin: 1rem 0;
-    }
-    .day {
-      padding: 1rem;
-      text-align: center;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-    .completed { background: #4caf50; color: white; } /* Green */
-    .rest { background: #2196f3; color: white; }      /* Blue */
-    .skipped { background: #e0e0e0; color: #555; }    /* Gray */
-    .dashboard, .motivation {
-      background: white;
-      padding: 1rem;
-      margin: 1rem 0;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .progress-bar {
-      background: #ddd;
-      border-radius: 20px;
-      overflow: hidden;
-      margin: 0.5rem 0;
-    }
-    .progress {
-      background: #6c63ff;
-      height: 20px;
-      width: 60%; /* dynamic */
-    }
-    .badge {
+
+    #navlinks {
       display: inline-block;
-      background: gold;
-      padding: 0.3rem 0.6rem;
-      border-radius: 12px;
-      margin: 0.2rem;
-      font-size: 0.9rem;
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+      margin: 10px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      transition: 0.3s;
+
+    }
+
+    #container {
+
+      display: grid;
+      grid-template-columns: auto auto auto;
+    }
+
+    .container {
+      border: 1px solid lightblue;
+      height: 80vh;
+      padding: 10px;
+    }
+    li *{
+      margin-left: 10px;
+    }
+
+    button {
+      border: 1px solid black;
+      cursor: pointer;
+      background-color: lightblue;
+    }
+    button:hover {
+      background-color: deepskyblue;
+      transition: 0.3s;
+    }
+
+    @media (max-width: 425px) {
+      #container {
+        grid-template-columns: auto;
+      }
+
+    }
+
+    @media (max-width: 768px) {
+      #container {
+        grid-template-columns: auto auto;
+      }
+
     }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>🌱 Positive Habit Tracker</h1>
-    <p>Focus on growth, not guilt</p>
-  </header>
-
-  <div class="container">
-    <!-- Calendar View -->
-    <h2>📅 This Month</h2>
-    <div class="calendar">
-      <div class="day completed">1</div>
-      <div class="day rest">2</div>
-      <div class="day skipped">3</div>
-      <div class="day completed">4</div>
-      <!-- ... -->
+  <nav>
+    Habit Tracker
+    <div id="navlinks">
+      <a href="home.html">Home</a>
+      <a href="Dashboard.html">Dashboard</a>
+      <a href="About.html">About</a>
     </div>
-
-    <!-- Dashboard -->
-    <div class="dashboard">
-      <h2>🎯 Your Progress</h2>
-      <p>You’ve completed <strong>12 sessions</strong> this month!</p>
-      <div class="progress-bar">
-        <div class="progress" style="width: 60%"></div>
+    <button id="toggle">Change Theme</button>
+  </nav>
+  <div id="container">
+    <div id="habitinputandlist" class="container">
+      <div id="habitinput">
+        <form action="" id="habitform">
+          <input type="text" id="newhabit" placeholder="Enter a new habit" required />
+          <input type="submit" value="Add this Habit">
+        </form>
       </div>
-      <p>Milestones: <span class="badge">5 Days</span> <span class="badge">10 Days</span></p>
-    </div>
+      <div id="habitlist">
+        <h4>Your habits:</h4>
+        <select name="" id="filter">
+          <option value="all" id="all">All</option>
+          <option value="completed" id="completed">Completed</option>
+          <option value="pending" id="pending">Pending</option>
+        </select>
+        <ul id="habits">
 
-    <!-- Motivation Feed -->
-    <div class="motivation">
-      <h2>💡 Motivation Feed</h2>
-      <p>✨ “Rest is part of growth. You’re still on track.”</p>
-      <p>🌟 Badge earned: <span class="badge">Balanced Achiever</span></p>
-      <p>😊 Mood correlation: Yoga days = +20% mood boost</p>
+        </ul>
+
+      </div>
     </div>
+    <div id="streaksandstats" class="container"></div>
+    <div id="qoutes" class="container"></div>
   </div>
+  <footer>
+    <p>&copy; 2024 Wellness Habit Tracker. All rights reserved.</p>
+  </footer>
+
+  <script>
+    console.log(document.getElementById('habits').children.length==0);
+    if(document.getElementById('habits').children.length==0){
+      document.getElementById('habits').innerHTML='<p id="nohabitsmsg"><i>No habits added yet. Start by adding a new habit!</i></p>';
+    }
+    document.getElementById('habitform').addEventListener('submit', newhabit);
+    //document.getElementById('completebtn'.addEventListener('click', completehabit));
+    //document.getElementById('delbtn').addEventListener('click', deletehabit);
+    function newhabit() {
+      event.preventDefault();
+      
+      if(document.getElementById('nohabitsmsg').style.display!='none')
+      document.getElementById('nohabitsmsg').style.display='none'; //clear "no habits" message when adding first habit
+      
+      const habitInput = document.getElementById('newhabit');
+      const habitList = document.getElementById('habits');
+      
+
+      const completebtn=document.createElement('button');
+      completebtn.textContent='Completed';
+      completebtn.classList.add('completebtn',habitInput.value);
+
+      const delbtn=document.createElement('button');
+      delbtn.textContent='Delete';
+      delbtn.classList.add('delbtn',habitInput.value);
+
+      const habititem = document.createElement('li');
+      habititem.textContent = habitInput.value;
+      habititem.id = 'pending';
+
+      habititem.appendChild(completebtn);
+      habititem.appendChild(delbtn);
+      console.log(habititem);
+
+      habitList.appendChild(habititem);
+      
+      habitInput.value = '';
+    }
+
+    document.getElementById('habits').addEventListener('click', changehabit);
+    function changehabit(e) {
+      if(e.target.classList.contains('completebtn')){
+        const habit=e.target.parentElement;
+        habit.id='completed';
+        habit.style.textDecoration='line-through';
+      }
+      else if(e.target.classList.contains('delbtn')){
+        const habit=e.target.parentElement;
+        habit.remove();
+        
+      }
+    }
+  </script>
 </body>
+
 </html>
