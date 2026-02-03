@@ -212,3 +212,30 @@ function loadHabits() {
     renderHabits(habits); // Your existing DOM rendering logic
   };
 }
+
+//add a habit to indexedDB
+function addHabitToDB(habitText) {
+  const tx = db.transaction("habits", "readwrite");
+  const store = tx.objectStore("habits");
+  const habit = { text: habitText, status: "pending" };
+  store.add(habit);
+}
+
+//update habit status in indexedDB
+function updateHabitStatusInDB(id, status) {
+  const tx = db.transaction("habits", "readwrite");
+  const store = tx.objectStore("habits");
+  const request = store.get(id);
+  request.onsuccess = function() {
+    const habit = request.result;
+    habit.status = status;
+    store.put(habit);
+  }
+}
+//delete habit from indexedDB
+function deleteHabitFromDB(id) {
+  const tx = db.transaction("habits", "readwrite");
+  const store = tx.objectStore("habits");
+  store.delete(id);
+}
+
