@@ -181,3 +181,34 @@
 
     // Initialize app on load
     initializeApp();
+
+
+    //indexedDB setup
+    let db;
+const request = indexedDB.open("HabitTrackerDB", 1);
+
+request.onupgradeneeded = function(event) {
+  db = event.target.result;
+  const store = db.createObjectStore("habits", { keyPath: "id", autoIncrement: true });
+  store.createIndex("status", "status", { unique: false });
+};
+
+request.onsuccess = function(event) {
+  db = event.target.result;
+  loadHabits(); // Load habits when DB is ready
+};
+
+request.onerror = function(event) {
+  console.error("Database error:", event.target.errorCode);
+};
+
+function loadHabits() {
+  const tx = db.transaction("habits", "readonly");
+  const store = tx.objectStore("habits");
+  const request = store.getAll();
+
+  request.onsuccess = function() {
+    const habits = request.result;
+    renderHabits(habits); // Your existing DOM rendering logic
+  };
+}
