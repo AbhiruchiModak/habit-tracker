@@ -48,6 +48,9 @@
       habititem.appendChild(buttonContainer);
 
       habitList.appendChild(habititem);
+      //save to indexedDB
+      addHabitToDB(habitInput.value);
+
       habitInput.value = '';
       
       updateStats();
@@ -209,16 +212,64 @@ function loadHabits() {
 
   request.onsuccess = function() {
     const habits = request.result;
-    renderHabits(habits); // Your existing DOM rendering logic
+    const habitList = document.getElementById('habits');
+    habitList.innerHTML = ''; // Clear existing list and load from DB
+
+    if (habits.length === 0) {
+      habitList.innerHTML = '<p id="nohabitsmsg">No habits added yet. Start by adding a new habit!</p>';
+    } else {
+      habits.forEach(habit => renderHabit(habit));
+    }
+
+    updateStats();
   };
 }
+
+
+
+function renderHabit(habit) {
+  const habititem = document.createElement('li');
+  habititem.id = habit.status;
+
+  const habitText = document.createElement('span');
+  habitText.textContent = habit.text;
+  if (habit.status === 'completed') {
+    habitText.style.textDecoration = 'line-through';
+  }
+
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.gap = '0.5rem';
+
+  const completebtn = document.createElement('button');
+  completebtn.textContent = habit.status === 'completed' ? '↺ Undo' : '✓ Complete';
+  completebtn.classList.add('completebtn');
+  completebtn.dataset.id = habit.id; // store DB id
+
+  const delbtn = document.createElement('button');
+  delbtn.textContent = '✕ Delete';
+  delbtn.classList.add('delbtn');
+  delbtn.dataset.id = habit.id;
+
+  buttonContainer.appendChild(completebtn);
+  buttonContainer.appendChild(delbtn);
+
+  habititem.appendChild(habitText);
+  habititem.appendChild(buttonContainer);
+
+  document.getElementById('habits').appendChild(habititem);
+}
+
 
 //add a habit to indexedDB
 function addHabitToDB(habitText) {
   const tx = db.transaction("habits", "readwrite");
   const store = tx.objectStore("habits");
   const habit = { text: habitText, status: "pending" };
-  store.add(habit);
+  const request = store.add(habit);
+  request.onsuccess = function() {
+    loadHabits(); // Refresh the habit list
+  };
 }
 
 //update habit status in indexedDB
