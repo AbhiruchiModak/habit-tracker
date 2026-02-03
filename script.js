@@ -58,29 +58,21 @@
 
     // Handle habit actions (complete/delete)
     document.getElementById('habits').addEventListener('click', function(e) {
-      if (e.target.classList.contains('completebtn')) {
-        const habit = e.target.closest('li');
-        if (habit.id === 'pending') {
-          habit.id = 'completed';
-          habit.querySelector('span').style.textDecoration = 'line-through';
-          e.target.textContent = '↺ Undo';
-        } else {
-          habit.id = 'pending';
-          habit.querySelector('span').style.textDecoration = 'none';
-          e.target.textContent = '✓ Complete';
-        }
-        updateStats();
-      } else if (e.target.classList.contains('delbtn')) {
-        const habit = e.target.closest('li');
-        habit.remove();
-        
-        const habitsList = document.getElementById('habits');
-        if (habitsList.children.length === 0) {
-          habitsList.innerHTML = '<p id="nohabitsmsg">No habits added yet. Start by adding a new habit!</p>';
-        }
-        updateStats();
-      }
-    });
+  if (e.target.classList.contains('completebtn')) {
+    const id = Number(e.target.dataset.id); // retrieve DB id
+    const habit = e.target.closest('li');
+
+    if (habit.id === 'pending') {
+      updateHabit(id, 'completed');
+    } else {
+      updateHabit(id, 'pending');
+    }
+
+  } else if (e.target.classList.contains('delbtn')) {
+    const id = Number(e.target.dataset.id);
+    deleteHabit(id);
+  }
+});
 
     // Theme toggle
     document.getElementById('toggle').addEventListener('click', function() {
@@ -273,20 +265,27 @@ function addHabitToDB(habitText) {
 }
 
 //update habit status in indexedDB
-function updateHabitStatusInDB(id, status) {
+function updateHabit(id, newStatus) {
   const tx = db.transaction("habits", "readwrite");
   const store = tx.objectStore("habits");
   const request = store.get(id);
+
   request.onsuccess = function() {
     const habit = request.result;
-    habit.status = status;
-    store.put(habit);
-  }
+    habit.status = newStatus;
+    store.put(habit).onsuccess = function() {
+      loadHabits(); // refresh UI after update
+    };
+  };
 }
+
 //delete habit from indexedDB
-function deleteHabitFromDB(id) {
+function deleteHabit(id) {
   const tx = db.transaction("habits", "readwrite");
   const store = tx.objectStore("habits");
-  store.delete(id);
+  store.delete(id).onsuccess = function() {
+    loadHabits(); // refresh UI after delete
+  };
 }
+
 
