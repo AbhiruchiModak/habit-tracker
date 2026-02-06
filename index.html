@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wellness Habit Tracker</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -26,14 +31,14 @@
   <div id="container">
     <div id="habitinputandlist" class="container">
       <div id="habitinput">
-        <h3>➕ Add New Habit</h3>
+        <h3>Add New Habit</h3>
         <form id="habitform">
           <input type="text" id="newhabit" placeholder="Enter a new habit (e.g., Drink 8 glasses of water)" required />
           <input type="submit" value="Add Habit">
         </form>
       </div>
       <div id="habitlist">
-        <h4>📋 Your Habits</h4>
+        <h4>Your Habits</h4>
         <select id="filter">
           <option value="all">All Habits</option>
           <option value="completed">✅ Completed</option>
@@ -48,7 +53,7 @@
     <div class="container">
       <div id="streaksandstats">
         <h3>📊 Your Progress</h3>
-        <p>🔥 Today's Completion Rate</p>
+        <p>Today's Completion Rate</p>
         <div id="circularprogressbar">
           <div class="progress-circle" id="progresscircle">
             <span id="progressvalue">0%</span>
@@ -62,7 +67,7 @@
 
     <div class="container">
       <div id="quotes">
-        <h3>💭 Daily Inspiration</h3>
+        <h3>Daily Inspiration</h3>
         <p>"The secret of getting ahead is getting started. Small daily improvements lead to stunning results."</p>
         <button id="newquotebtn">✨ New Quote</button>
       </div>
@@ -73,7 +78,25 @@
     <p>&copy; 2025 Wellness Habit Tracker. All rights reserved. 💙</p>
   </footer>
 
-  <script src="script.js">
+  <script src="script.js"></script>
+  <script>
+    // Set active page on load (specifically for index.html/dashboard)
+    window.addEventListener('DOMContentLoaded', function() {
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      const navLinks = document.querySelectorAll('#navlinks a');
+      
+      navLinks.forEach(link => {
+        const linkPage = link.getAttribute('href');
+        // Match both 'index.html' and empty string (root) to dashboard link
+        if (linkPage === currentPage || 
+            (currentPage === 'index.html' && linkPage === 'index.html') ||
+            (currentPage === '' && linkPage === 'index.html')) {
+          link.classList.add('active-page');
+        } else {
+          link.classList.remove('active-page');
+        }
+      });
+    });
   </script>
 </body>
 

@@ -1,4 +1,23 @@
 
+        //indexedDB setup
+    let db;
+const request = indexedDB.open("HabitTrackerDB", 1);
+
+request.onupgradeneeded = function(event) {
+  db = event.target.result;
+  const store = db.createObjectStore("habits", { keyPath: "id", autoIncrement: true });
+  store.createIndex("status", "status", { unique: false });
+};
+
+request.onsuccess = function(event) {
+  db = event.target.result;
+  loadHabits(); // Load habits when DB is ready
+};
+
+request.onerror = function(event) {
+  console.error("Database error:", event.target.errorCode);
+};
+    
     // Initialize display
     function initializeApp() {
       const habitsList = document.getElementById('habits');
@@ -141,19 +160,26 @@
 
     // Update statistics
     function updateStats() {
-      const allHabits = document.querySelectorAll('#habits li');
-      const completedHabits = document.querySelectorAll('#habits li#completed');
-      const total = allHabits.length;
-      const completed = completedHabits.length;
-      
-      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-      updateProgressCircle(percentage);
-      
-      const statsDiv = document.getElementById('stats');
-      statsDiv.innerHTML = `
-        <p>✅ Total Habits Completed: <strong>${completed}</strong></p>
-      `;
-    }
+  const tx = db.transaction("habits", "readonly");
+  const store = tx.objectStore("habits");
+  const request = store.getAll();
+
+  request.onsuccess = function() {
+    const habits = request.result;
+    const total = habits.length;
+    const completed = habits.filter(h => h.status === "completed").length;
+
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    updateProgressCircle(percentage);
+
+    const statsDiv = document.getElementById('stats');
+    statsDiv.innerHTML = `
+      <p>✅ Total Habits Completed: <strong>${completed}</strong></p>
+      <p>📊 Total Habits: <strong>${total}</strong></p>
+    `;
+  };
+}
+
 
     // Motivational quotes
     const quotes = [
@@ -174,28 +200,55 @@
       document.querySelector('#quotes p').textContent = `"${randomQuote}"`;
     });
 
+    // Scroll to Top Button functionality
+    // Create scroll button if it doesn't exist
+    if (!document.getElementById('scrollToTop')) {
+      const scrollBtn = document.createElement('button');
+      scrollBtn.id = 'scrollToTop';
+      scrollBtn.innerHTML = '↑';
+      scrollBtn.setAttribute('aria-label', 'Scroll to top');
+      document.body.appendChild(scrollBtn);
+      
+      // Show/hide scroll button based on scroll position
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          scrollBtn.classList.add('show');
+        } else {
+          scrollBtn.classList.remove('show');
+        }
+      });
+      
+      // Scroll to top when clicked
+      scrollBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+
     // Initialize app on load
     initializeApp();
 
 
-    //indexedDB setup
-    let db;
-const request = indexedDB.open("HabitTrackerDB", 1);
+//     //indexedDB setup
+//     let db;
+// const request = indexedDB.open("HabitTrackerDB", 1);
 
-request.onupgradeneeded = function(event) {
-  db = event.target.result;
-  const store = db.createObjectStore("habits", { keyPath: "id", autoIncrement: true });
-  store.createIndex("status", "status", { unique: false });
-};
+// request.onupgradeneeded = function(event) {
+//   db = event.target.result;
+//   const store = db.createObjectStore("habits", { keyPath: "id", autoIncrement: true });
+//   store.createIndex("status", "status", { unique: false });
+// };
 
-request.onsuccess = function(event) {
-  db = event.target.result;
-  loadHabits(); // Load habits when DB is ready
-};
+// request.onsuccess = function(event) {
+//   db = event.target.result;
+//   loadHabits(); // Load habits when DB is ready
+// };
 
-request.onerror = function(event) {
-  console.error("Database error:", event.target.errorCode);
-};
+// request.onerror = function(event) {
+//   console.error("Database error:", event.target.errorCode);
+// };
 
 function loadHabits() {
   const tx = db.transaction("habits", "readonly");
@@ -287,5 +340,4 @@ function deleteHabit(id) {
     loadHabits(); // refresh UI after delete
   };
 }
-
 
